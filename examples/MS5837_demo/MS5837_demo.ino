@@ -22,7 +22,7 @@ void setup()
   Serial.println();
 
   Wire.begin();
-  if (MS.begin() == true)
+  if (MS.begin(0) == true)
   {
     Serial.println("MS5837 found.");
   }
