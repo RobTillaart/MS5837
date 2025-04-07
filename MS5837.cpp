@@ -1,7 +1,7 @@
 //
 //    FILE: MS5837.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.0
+// VERSION: 0.1.1
 //    DATE: 2023-11-12
 // PURPOSE: Arduino library for MS5837 temperature and pressure sensor.
 //     URL: https://github.com/RobTillaart/MS5837
@@ -50,10 +50,10 @@ bool MS5837::reset(uint8_t mathMode)
 
   initConstants(mathMode);
 
-  //  SKIP CRC check
+  //  SKIP CRC check (for now)
 
   //  derive the type from mathMode instead of the other way around.
-  //  user must
+  //  user must provide correct mathMode.
   _type = MS5837_TYPE_30;
   if (mathMode == 1) _type = MS5837_TYPE_02;
   if (mathMode == 2) _type = MS5803_TYPE_01;
@@ -83,11 +83,16 @@ bool MS5837::read(uint8_t bits)
   index -= 8;
   uint8_t waitMillis[6] = { 1, 2, 3, 5, 9, 18 };
   uint8_t wait = waitMillis[index];
-  
+
    //  D1 conversion
   _wire->beginTransmission(_address);
   _wire->write(MS5837_CMD_CONVERT_D1 + index * 2);
-  _wire->endTransmission();  //  TODO check all of these
+  _error = _wire->endTransmission();
+  if (_error != 0)
+  {
+    //  TODO error code.
+    return false;
+  }
 
   uint32_t start = millis();
 
@@ -103,7 +108,12 @@ bool MS5837::read(uint8_t bits)
    //  D2 conversion
   _wire->beginTransmission(_address);
   _wire->write(MS5837_CMD_CONVERT_D2 + index * 2);
-  _wire->endTransmission();
+  _error = _wire->endTransmission();
+  if (_error != 0)
+  {
+    //  TODO error code.
+    return false;
+  }
 
   start = millis();
   //  while loop prevents blocking RTOS
@@ -112,6 +122,7 @@ bool MS5837::read(uint8_t bits)
     yield();
     delay(1);
   }
+  _lastRead = start;
 
   //  NOTE: D1 and D2 are reserved in MBED (NANO BLE)
   uint32_t _D2 = readADC();
@@ -143,6 +154,11 @@ bool MS5837::read(uint8_t bits)
   return true;
 }
 
+uint32_t MS5837::lastRead()
+{
+  return _lastRead;
+}
+
 
 float MS5837::getPressure()
 {
@@ -165,7 +181,6 @@ float MS5837::getAltitude(float airPressure)
 }
 
 
-
 //////////////////////////////////////////////////////////////////////
 //
 //  DENSITY for depth
@@ -186,10 +201,22 @@ float MS5837::getDepth(float airPressure)
   //  1 / (_density * 9.80665 * 10)  can be pre-calculated and cached in setDensity.
   //
   //  delta P = rho * g * h  => h = delta P / rho * g
-  //  pressure = mbar, density grams/cm3 => correction factor 0.1 (=1/10)
+  //  pressure = mbar,
+  //  density grams/cm3 => correction factor 0.1 (= 1/10)
   return (_pressure - airPressure)/(_density * 9.80665 * 10);
 }
 
+
+//////////////////////////////////////////////////////////////////////
+//
+//  ERROR
+//
+int MS5837::getLastError()
+{
+  int e = _error;
+  _error = 0;
+  return e;
+}
 
 
 //////////////////////////////////////////////////////////////////////
