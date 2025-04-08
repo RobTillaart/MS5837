@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - update readme.md
 - add **int lastError()** to prepare error handling
 - add **uint32_t lastRead()**
-- 
+- minor edits
 
 
 ## [0.1.0] - 2023-12-24

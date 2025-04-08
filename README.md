@@ -28,7 +28,7 @@ The library does not use the partially 64 bit integer math as described in the d
 Instead it uses float math.
 This choice reduces footprint on e.g. AVR and increases the math performance.
 This will however have an effect on the accuracy of the results, 
-although these are expected relative small. (TODO investigate)
+although these are expected relative small.
 
 The library is not tested with hardware yet.
 
@@ -67,7 +67,7 @@ The library implements **reset(uint8_t mathMode = 0)** to select the mathMode.
 - mathMode = 1 ==> datasheet MS5837_02  page 7
 - mathMode = 2 ==> datasheet MS5803_01  page 7
 
-- other values will act as 0
+- other values will act as 0 (until new math pops up).
 
 
 ### Tests
@@ -76,7 +76,7 @@ The MS5837 library uses similar code as the tested MS5611 library.
 
 TODO: test with hardware.
 
-The library is tested with the following boards: TODO
+The library is tested with the following boards:
 
 As always feedback is welcome.
 
@@ -88,10 +88,16 @@ Please let me know of other working platforms / processors (and failing ones!).
 User has to call **Wire.begin()** (or equivalent) and optional set the I2C pins
 before calling **MS5837.begin(mathMode)**.
 
-
 ### Performance
 
-The maximum I2C speed is 400 KHz. (TODO verify).
+The maximum I2C speed is 400 kHz according to the datasheet.
+
+The **read()** call has two blocking delays to read two ADC values.
+THerefore the I2C speed is not a parameter to be tuned. 
+
+### Address
+
+The MS5837 has a fixed I2C address: 0x76.
 
 ### I2C multiplexing
 
@@ -135,12 +141,17 @@ Returns 30 or 2 or zero if unknown.
 The bits determines the oversampling factor, see table below. 
 Returns true upon success, false otherwise.
 The call will block for 3 to 40 milliseconds, depending upon number of bits.
-- **uint32_t lastRead()** returns the timestamp of the last read in milliseconds
- since start. 
-- **float getPressure()** returns mBar.
-- **float getTemperature()** returns degrees Celsius.
-- **float getAltitude(float airPressure = 1013.25)** calculates the altitude, based upon actual pressure and the pressure at sea level.
-Returns altitude in meters.
+- **uint32_t lastRead()** returns the timestamp of the last call to read() in 
+milliseconds since start. 
+It does not take into account if the read call is successful or not.
+- **float getPressure()** returns pressure in mBar.
+Multiple calls will return the same value until read() is called again.
+- **float getTemperature()** returns temperature in degrees Celsius.
+Multiple calls will return the same value until read() is called again.
+- **float getAltitude(float airPressure = 1013.25)** calculates the altitude,
+based upon actual pressure measured and the current pressure at sea level.
+Returns the altitude in meters.
+Multiple calls will return the same value until read() is called again.
 One can compensate for the actual air pressure at sea level.
 
 |  type       |  bits read()  | 
@@ -155,12 +166,14 @@ One can compensate for the actual air pressure at sea level.
 Mainly for the MS5837_30.
 
 Depth calculation depends on the air pressure at sea level, and the density
-of the liquid you are submerged in. 
-This could be (sea) water, so the salinity might play a factor, and could 
-even not be a constant value.
+of the liquid you are submerged in.
+The density might not be a constant value and may vary over time.
+It depends e.g. on the salinity (sea water) and temperature. 
 
-The pressure is in fact the sum of the air pressure and the weight of the liquid above.
-If the density is larger the maximum depth of the sensor will decrease.
+The pressure is in fact the sum of the air pressure and the weight of the 
+liquid above the sensor.
+If the density of the is larger than water the maximum depth at which the
+sensor will work will decrease. Denser liquids give more pressure.
 
 - **void setDensity(float density = 0.99802)** set liquid density.
 density water 20°C = 0.99802
@@ -169,6 +182,7 @@ density water 20°C = 0.99802
 based upon actual pressure and the pressure at sea level.
 Returns depth in meters.
 One can compensate for the actual air pressure at sea level.
+Multiple calls will return the same value until read() is called again.
 
 
 ### Error handling
@@ -179,32 +193,32 @@ experimental / minimal
 Resets to 0 when called.
 
 
-### Density water 
+### Density 
 
-Some indicative figures about density of water.
+Some indicative figures about density of water and other liquids.
 
 #### Temperature
 
 Density table for (distilled) water H20, density in gram / cm3
 From - https://www.usgs.gov/special-topics/water-science-school/science/water-density
 
-|  Temperature    |  Density  |
-|:---------------:|:---------:|
-|  32°F/0°C       |  0.99987  |
-|  39.2°F/4.0°C   |  1.00000  |
-|  40°F/4.4°C     |  0.99999  |
-|  50°F/10°C      |  0.99975  |
-|  60°F/15.6°C    |  0.99907  |
-|  70°F/21°C      |  0.99802  |
-|  80°F/26.7°C    |  0.99669  |
-|  90°F/32.2°C    |  0.99510  |
-|  100°F/37.8°C   |  0.99318  |
-|  120°F/48.9°C   |  0.98870  |
-|  140°F/60°C     |  0.98338  |
-|  160°F/71.1°C   |  0.97729  |
-|  180°F/82.2°C   |  0.97056  |
-|  200°F/93.3°C   |  0.96333  |
-|  212°F/100°C	  |  0.95865  |
+|  Temp   |  Temp    |  Density  |
+|:-------:|:--------:|:---------:|
+|  32°F   |  0.0°C   |  0.99987  |
+|  39.2°F |  4.0°C   |  1.00000  |
+|  40°F   |  4.4°C   |  0.99999  |
+|  50°F   |  10.0°C  |  0.99975  |
+|  60°F   |  15.6°C  |  0.99907  |
+|  70°F   |  21.1°C  |  0.99802  |
+|  80°F   |  26.7°C  |  0.99669  |
+|  90°F   |  32.2°C  |  0.99510  |
+|  100°F  |  37.8°C  |  0.99318  |
+|  120°F  |  48.9°C  |  0.98870  |
+|  140°F  |  60.0°C  |  0.98338  |
+|  160°F  |  71.1°C  |  0.97729  |
+|  180°F  |  82.2°C  |  0.97056  |
+|  200°F  |  93.3°C  |  0.96333  |
+|  212°F  |  100°C   |  0.95865  |
 
 
 #### Seawater
@@ -230,20 +244,84 @@ From - https://www.britannica.com/science/seawater/Density-of-seawater-and-press
 |  Meter  |  Density  |
 |:-------:|:---------:|
 |  0      |  1.02813  |
-|  1,000  |  1.03285  |
-|  2,000  |  1.03747  |
-|  4,000  |  1.04640  |
-|  6,000  |  1.05495  |
-|  8,000  |  1.06315  |
-|  10,000 |  1.07104  |
+|  1000   |  1.03285  |
+|  2000   |  1.03747  |
+|  4000   |  1.04640  |
+|  6000   |  1.05495  |
+|  8000   |  1.06315  |
+|  10000  |  1.07104  |
 
-This is almost a linear relation (from spreadsheet): 
+This is almost a linear relation.
+In formula (spreadsheet): 
 ```
 density = 1.02869 + 4.295e-6 x depth (meters)
 ```
 
 For 30 meter the device can go under water the density is about ~1.02829.  
 For 15 meter (average density from 0..30 mtr) it is about ~1.02821.
+
+
+#### Other liquids
+
+From - https://www.sfu.ca/phys/demos/demoindex/fluids/fl2b/density.html
+
+Fluid Density (g/cm3) at 20C and 1 atm unless noted
+
+|  Liquid         |  Density        |
+|:---------------:|:---------------:|
+|  water          |  0.99820        |
+|  water (0 C)    |  0.99984        |
+|  water (4 C)    |  0.99997        |
+|  water (100 C)  |  0.95836        |
+|  gasoline       |  0.66 - 0.69    |
+|  ethyl alcohol  |  0.791          |
+|  turpentine     |  0.85           |
+|  olive oil      |  0.9            |
+|  castor oil     |  0.969          |
+|  sea water      |  1.03           |
+|  milk           |  1.028 - 1.035  |
+|  glycerin       |  1.260          |
+|  mercury        |  13.55          |
+
+
+#### Solution - sodium chloride in water
+
+From - https://www.sfu.ca/phys/demos/demoindex/fluids/fl2b/density.html
+
+grams solute/100 grams solution, density (g/cm3)
+
+|  Solution  |  Density  |  Notes  |
+|:----------:|:---------:|:-------:|
+|      3.5   |   1.0236  |  sea water, from Wikipedia, see above.
+|     10.0   |   1.0726  |
+|     20.0   |   1.1498  |
+|     26.0   |   1.1993  |
+
+in formula  (spreadsheet)
+
+```
+density = 0.995413 + 0.00779241 * solution;
+```
+
+#### Solution - sucrose in water
+
+From - https://www.sfu.ca/phys/demos/demoindex/fluids/fl2b/density.html
+
+grams solute/100 grams solution, density (g/cm3)
+
+|  Solution  |  Density  |
+|:----------:|:---------:|
+|     5      |  1.0197   |
+|     10     |  1.0400   |
+|     15     |  1.0610   |
+|     19     |  1.0784   |
+
+
+in formula (spreadsheet)
+
+```
+density = 0.998438 + 0.0041907 * solution;
+```
 
 
 ## Future
@@ -253,16 +331,23 @@ For 15 meter (average density from 0..30 mtr) it is about ~1.02821.
 - improve documentation
 - buy hardware - 30 or 2 bar version, both?
 - check TODO's in code / documentation
-- test 
+- test
+
 
 #### Should
 
+- improve error handling
 - create derived classes?
   - so one does not need to set mathMode.
-  - for 5803 
-- can we see conversion ready?
-- performance test
+  - for 5803
 - investigate the effects of float math on accuracy / precision.
+- async interface.
+  - can we see conversion ready?
+  - **void requestMeasurement()** starts conversion D1.
+  - **bool ready()** checks D1 to be ready, starts D2, checks D2 to be ready
+  - could be 0.2.0 if sync version works. 
+  - ==> also MS5611 ?
+- add OSR factor to code
 
 
 #### Could
@@ -270,10 +355,12 @@ For 15 meter (average density from 0..30 mtr) it is about ~1.02821.
 - add **void setAirPressure(float airPressure)** idea is to set it only once when P changes.
 - add **float getAirPressure()** return last set value.
 - refactor type & mathMode
-- add offset functions
+- add offset functions for all measurements?
 
 
 #### Won't (unless requested)
+
+- performance test (as read is blocking)
 
 
 ## Support

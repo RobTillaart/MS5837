@@ -75,6 +75,7 @@ uint8_t MS5837::getAddress()
 //
 //  READ
 //
+//  datasheet page 7
 bool MS5837::read(uint8_t bits)
 {
   if (isConnected() == false) return false;
@@ -90,7 +91,7 @@ bool MS5837::read(uint8_t bits)
   _error = _wire->endTransmission();
   if (_error != 0)
   {
-    //  TODO error code.
+    //  _error = MS5837_I2C_ERROR ?
     return false;
   }
 
@@ -102,7 +103,7 @@ bool MS5837::read(uint8_t bits)
     yield();
     delay(1);
   }
-  //  NOTE: D1 and D2 are reserved in MBED (NANO BLE)
+  //  NOTE: names D1 and D2 are reserved in MBED (NANO BLE)
   uint32_t _D1 = readADC();
 
    //  D2 conversion
@@ -111,7 +112,7 @@ bool MS5837::read(uint8_t bits)
   _error = _wire->endTransmission();
   if (_error != 0)
   {
-    //  TODO error code.
+    //  _error = MS5837_I2C_ERROR ?
     return false;
   }
 
@@ -122,9 +123,8 @@ bool MS5837::read(uint8_t bits)
     yield();
     delay(1);
   }
-  _lastRead = start;
 
-  //  NOTE: D1 and D2 are reserved in MBED (NANO BLE)
+  //  NOTE: names D1 and D2 are reserved in MBED (NANO BLE)
   uint32_t _D2 = readADC();
 
   float dT = _D2 - C[5];
@@ -151,6 +151,7 @@ bool MS5837::read(uint8_t bits)
   _pressure = (_D1 * sens * 4.76837158203E-7 - offset) * C[7] * 0.01;
   _temperature *= 0.01;
 
+  _lastRead = millis();
   return true;
 }
 
@@ -164,6 +165,7 @@ float MS5837::getPressure()
 {
   return _pressure;
 }
+
 
 float MS5837::getTemperature()
 {

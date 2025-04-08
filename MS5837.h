@@ -12,12 +12,10 @@
 #include "Wire.h"
 
 
-//  TODO OSR factor in code?
-
-
 #define MS5837_LIB_VERSION        (F("0.1.1"))
 
 
+//  TYPES
 #define MS5803_TYPE_01             1
 #define MS5837_TYPE_02             2
 #define MS5837_TYPE_30            30
@@ -31,11 +29,11 @@ public:
   //  MS5837-30bar = 0
   //  MS5837-02bar = 1
   //  MS5803-02bar = 2
-  bool    begin(uint8_t mathMode);
-  bool    isConnected();
-  bool    reset(uint8_t mathMode);
-  uint8_t getType();
-  uint8_t getAddress();
+  bool     begin(uint8_t mathMode);
+  bool     isConnected();
+  bool     reset(uint8_t mathMode);
+  uint8_t  getType();
+  uint8_t  getAddress();
 
 
   //////////////////////////////////////////////////////////////////////
