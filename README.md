@@ -22,13 +22,16 @@ The MS5837 is a waterproof device to measure temperature and pressure to a high 
 of accuracy.
 From the pressure one can calculate the depth or the altitude of the sensor to some extend.
 - The MS5837_30 can go to depth of about 300 meter (30 Bar).
-- The MS5837_02 is meant for altitude measurements as it can as low as 300 mBar.
+- The MS5837_02 is meant for altitude measurements as it can as low as 300 mBar, -20°C
+- The MS5803_01 is meant for altitude measurements as it can as low as 10 mBar, -40°C
+
+The library only supports I2C based sensors, fixed address 0x76.
 
 The library does not use the partially 64 bit integer math as described in the datasheet.
 Instead it uses float math.
 This choice reduces footprint on e.g. AVR and increases the math performance.
 This will however have an effect on the accuracy of the results, 
-although these are expected relative small.
+although these are expected to be relative small.
 
 The library is not tested with hardware yet.
 
@@ -50,10 +53,10 @@ See also .h file
 See mathType notes below.
 
 |  Sensor         | mathType |  Celsius °C  |  pressure mBar  |  Notes  |
-|:----------------|:--------:|:------------:|:---------------:|:-------:|
-|  MS5837-30 bar  |    0     |  -20 to +85  |  0 to 30000     |  for depth
+|:----------------|:--------:|:------------:|:---------------:|:--------|
+|  MS5837-30 bar  |    0     |  -20 to +85  |  0 to 30000     |  for depth (under water).
 |  MS5837-02 bar  |    1     |  -20 to +85  |  300 to 1200    |  for altitude
-|  MS5803-01 bar  |    2     |  -40 to +85  |  10 to 1300     |  for altitude, investigate
+|  MS5803-01 bar  |    2     |  -40 to +85  |  10 to 1300     |  for altitude
 
 
 ### Pressure mathType 
@@ -141,6 +144,14 @@ Returns 30 or 2 or zero if unknown.
 The bits determines the oversampling rate (OSR), see table below. 
 Returns true upon success, false otherwise.
 The call will block for 3 to 40 milliseconds, depending upon number of bits.
+
+|  type       |  bits read()  | 
+|:-----------:|:-------------:|
+|  MS5837_30  |  8..13        |
+|  MS5837_02  |  8..13        |
+|  MS5803_01  |  8..12        |
+
+
 - **uint32_t lastRead()** returns the timestamp of the last call to read() in 
 milliseconds since start. 
 It does not take into account if the read call is successful or not.
@@ -154,11 +165,11 @@ Returns the altitude in meters.
 Multiple calls will return the same value until read() is called again.
 One can compensate for the actual air pressure at sea level.
 
-|  type       |  bits read()  | 
-|:-----------:|:-------------:|
-|  MS5837_30  |  8..13        |
-|  MS5837_02  |  8..13        |
-|  MS5803_01  |  8..12        |
+Experimental note.
+
+**getALtitude()** might even work in caves below sea level, as the sensors can
+measure up to 1200/1300 hPa. See air pressure table below. 
+This assumption is not confirmed yet.
 
 
 ### Depth
@@ -327,6 +338,48 @@ in formula (spreadsheet)
 ```
 density = 0.998438 + 0.0041907 * solution;
 ```
+
+
+### Air pressure vs sea level
+
+From - https://www.nwflowtech.com/media/0y0aizb3/nwft-barometric-pressure-vs-altitude-table-122120-v2.pdf
+
+|  Feet    |  Meters  |  hPa   |  Notes  |
+|:--------:|:--------:|:------:|:--------|
+|  -5000   |  -1524   |  1211  |
+|  -4000   |  -1219,2 |  1169  |
+|  -3000   |  -914,4  |  1129  |
+|  -2000   |  -609,6  |  1089  |
+|  -1000   |  -304,8  |  1051  |
+|  -500    |  -152,4  |  1032  |
+|  -100    |  -30,5   |  1018  |
+|  -50     |  -15,2   |  1016  |
+|  0       |  0       |  1013  |  Sea level
+|  50      |  15,2    |  1012  |
+|  100     |  30,5    |  1010  |
+|  200     |  61      |  1007  |  
+|  300     |  91,4    |  1003  |
+|  400     |  121,9   |   999  |
+|  500     |  152,4   |   996  |
+|  600     |  182,9   |   992  |
+|  700     |  213,4   |   989  |
+|  800     |  243,8   |   985  |
+|  900     |  274,3   |   982  |
+|  1000    |  304,8   |   978  |
+|  1500    |  457,2   |   960  |
+|  2000    |  609,6   |   943  |
+|  2500    |  762     |   926  |
+|  3000    |  914,4   |   909  |
+|  3500    |  1066,8  |   892  |
+|  4000    |  1219,2  |   876  |
+|  4500    |  1371,6  |   860  |
+|  5000    |  1524    |   844  |
+|  6000    |  1828,8  |   813  |
+|  7000    |  2133,6  |   783  |
+|  8000    |  2438,4  |   754  |
+|  9000    |  2743,2  |   725  |
+|  10000   |  3048    |   698  |
+
 
 
 ## Future
