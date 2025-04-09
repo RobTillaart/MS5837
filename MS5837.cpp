@@ -178,12 +178,12 @@ float MS5837::getTemperature()
 
 
 //  https://www.mide.com/air-pressure-at-altitude-calculator
-//  https://community.bosch-sensortec.com/t5/Question-and-answers/How-to-calculate-the-altitude-from-the-pressure-sensor-data/qaq-p/5702
-//
+//  https://community.bosch-sensortec.com/t5/Question-and-answers/How-to-calculate-the-altitude-from-the-pressure-sensor-data/qaq-p/5702 (stale link).
+//  https://en.wikipedia.org/wiki/Pressure_altitude
 float MS5837::getAltitude(float airPressure)
 {
   float ratio = _pressure / airPressure;
-	return 44330 * (1 - pow(ratio, 0.190294957));
+  return 44330 * (1 - pow(ratio, 0.190294957));
 }
 
 

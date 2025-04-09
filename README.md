@@ -340,7 +340,7 @@ density = 0.998438 + 0.0041907 * solution;
 ```
 
 
-### Air pressure vs sea level
+### Air pressure vs sea level 
 
 From - https://www.nwflowtech.com/media/0y0aizb3/nwft-barometric-pressure-vs-altitude-table-122120-v2.pdf
 
@@ -354,7 +354,7 @@ From - https://www.nwflowtech.com/media/0y0aizb3/nwft-barometric-pressure-vs-alt
 |  -500    |  -152,4  |  1032  |
 |  -100    |  -30,5   |  1018  |
 |  -50     |  -15,2   |  1016  |
-|  0       |  0       |  1013  |  Sea level
+|  0       |  0       |  1013  |  Sea level 1013.25
 |  50      |  15,2    |  1012  |
 |  100     |  30,5    |  1010  |
 |  200     |  61      |  1007  |  
@@ -380,6 +380,22 @@ From - https://www.nwflowtech.com/media/0y0aizb3/nwft-barometric-pressure-vs-alt
 |  9000    |  2743,2  |   725  |
 |  10000   |  3048    |   698  |
 
+
+From - https://www.mide.com/air-pressure-at-altitude-calculator
+
+|  Feet    |  Meters  |  hPa   |  Notes  |
+|:--------:|:--------:|:------:|:--------|
+|  15000   |  4572    |   572  |  bigger steps from here.
+|  20000   |  6096    |   466  |
+|  25000   |  7620    |   376  |
+|  30000   |  9144    |   301  |
+|  35000   |  10668   |   238  |
+|  40000   |  12192   |   188  |
+|  45000   |  13716   |   147  |
+|  50000   |  15240   |   116  |
+|  55000   |  16764   |    91  |
+|  60000   |  18288   |    72  |
+|  65000   |  19812   |    56  |
 
 
 ## Future
