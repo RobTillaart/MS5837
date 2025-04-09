@@ -163,7 +163,7 @@ One can compensate for the actual air pressure at sea level.
 
 ### Depth
 
-Mainly for the MS5837_30.
+For MS5837_30 only.
 
 Depth calculation depends on the air pressure at sea level, and the density
 of the liquid you are submerged in.
@@ -193,11 +193,13 @@ experimental / minimal
 Resets to 0 when called.
 
 
-### Density 
+## Density 
 
 Some indicative figures about density of water and other liquids.
+Different sources give slight variations, which are less than 0.1%.
 
-#### Temperature
+
+### Temperature
 
 Density table for (distilled) water H20, density in gram / cm3
 From - https://www.usgs.gov/special-topics/water-science-school/science/water-density
@@ -220,8 +222,10 @@ From - https://www.usgs.gov/special-topics/water-science-school/science/water-de
 |  200°F  |  93.3°C  |  0.96333  |
 |  212°F  |  100°C   |  0.95865  |
 
+One can linear interpolate between these points.
 
-#### Seawater
+
+### Seawater
 
 From - https://en.wikipedia.org/wiki/Seawater
 
@@ -230,11 +234,11 @@ depending on the temperature and salinity.
 At a temperature of 25 °C, the salinity of 35 g/kg
 and 1 atm pressure, the density of seawater is 1023.6 kg/m3.
 
-The salinity of water can differ a lot e.g. near a river mouth sweet and salt
-water mix continuously.
+The salinity of water can differ a lot e.g. near a river mouth sweet 
+and salt water mix continuously.
 
 
-#### Depth
+### Depth (seawater)
 
 The density varies also with depth, although for the range of this sensor
 this difference is very small.
@@ -252,16 +256,17 @@ From - https://www.britannica.com/science/seawater/Density-of-seawater-and-press
 |  10000  |  1.07104  |
 
 This is almost a linear relation.
-In formula (spreadsheet): 
+In formula (spreadsheet):
+
 ```
-density = 1.02869 + 4.295e-6 x depth (meters)
+density = 1.02869 + 4.295e-6 * depth (meters)
 ```
 
 For 30 meter the device can go under water the density is about ~1.02829.  
-For 15 meter (average density from 0..30 mtr) it is about ~1.02821.
+For 15 meter (average density from 0..30 meter) it is about ~1.02821.
 
 
-#### Other liquids
+### Other liquids
 
 From - https://www.sfu.ca/phys/demos/demoindex/fluids/fl2b/density.html
 
@@ -284,7 +289,7 @@ Fluid Density (g/cm3) at 20C and 1 atm unless noted
 |  mercury        |  13.55          |
 
 
-#### Solution - sodium chloride in water
+### Solution - sodium chloride in water
 
 From - https://www.sfu.ca/phys/demos/demoindex/fluids/fl2b/density.html
 
@@ -303,7 +308,7 @@ in formula  (spreadsheet)
 density = 0.995413 + 0.00779241 * solution;
 ```
 
-#### Solution - sucrose in water
+### Solution - sucrose in water
 
 From - https://www.sfu.ca/phys/demos/demoindex/fluids/fl2b/density.html
 
@@ -339,14 +344,8 @@ density = 0.998438 + 0.0041907 * solution;
 - improve error handling
 - create derived classes?
   - so one does not need to set mathMode.
-  - for 5803
+  - for MS5803
 - investigate the effects of float math on accuracy / precision.
-- async interface.
-  - can we see conversion ready?
-  - **void requestMeasurement()** starts conversion D1.
-  - **bool ready()** checks D1 to be ready, starts D2, checks D2 to be ready
-  - could be 0.2.0 if sync version works. 
-  - ==> also MS5611 ?
 - add OSR factor to code
 
 
@@ -356,11 +355,19 @@ density = 0.998438 + 0.0041907 * solution;
 - add **float getAirPressure()** return last set value.
 - refactor type & mathMode
 - add offset functions for all measurements?
+  - 3 offsets float == 12 bytes + 6 functions get/set.
+- async interface.
+  - can we see conversion ready?
+  - **void requestMeasurement()** starts conversion D1.
+  - **bool ready()** checks D1 to be ready, starts D2, checks D2 to be ready
+  - need multiple calls to initiate steps.
+  - could be 0.2.0 if sync version works. 
+  - ==> also MS5611 ?
 
 
 #### Won't (unless requested)
 
-- performance test (as read is blocking)
+- performance test (as long as read is blocking)
 
 
 ## Support
