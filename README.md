@@ -49,11 +49,11 @@ See also .h file
 
 See mathType notes below.
 
-|  Sensor        | mathType |  Celsius °C  |  pressure mBar  |  Notes  |
-|:---------------|:--------:|:------------:|:---------------:|:-------:|
-|  MS5837-30bar  |    0     |  -20 to +85  |  0 to 30000     |  for depth
-|  MS5837-02bar  |    1     |  -20 to +85  |  300 to 1200    |  for altitude
-|  MS5803-01bar  |    2     |  -40 to +85  |  10 to 1300     |  for altitude, investigate
+|  Sensor         | mathType |  Celsius °C  |  pressure mBar  |  Notes  |
+|:----------------|:--------:|:------------:|:---------------:|:-------:|
+|  MS5837-30 bar  |    0     |  -20 to +85  |  0 to 30000     |  for depth
+|  MS5837-02 bar  |    1     |  -20 to +85  |  300 to 1200    |  for altitude
+|  MS5803-01 bar  |    2     |  -40 to +85  |  10 to 1300     |  for altitude, investigate
 
 
 ### Pressure mathType 
@@ -138,7 +138,7 @@ Returns 30 or 2 or zero if unknown.
 ### Temperature and Pressure
 
 - **bool read(uint8_t bits = 8)** the actual reading of the sensor. 
-The bits determines the oversampling factor, see table below. 
+The bits determines the oversampling rate (OSR), see table below. 
 Returns true upon success, false otherwise.
 The call will block for 3 to 40 milliseconds, depending upon number of bits.
 - **uint32_t lastRead()** returns the timestamp of the last call to read() in 
@@ -156,8 +156,8 @@ One can compensate for the actual air pressure at sea level.
 
 |  type       |  bits read()  | 
 |:-----------:|:-------------:|
-|  MS5837_30  |  8..12        |
-|  MS5837_02  |  8..12, 13    |
+|  MS5837_30  |  8..13        |
+|  MS5837_02  |  8..13        |
 |  MS5803_01  |  8..12        |
 
 
@@ -334,9 +334,8 @@ density = 0.998438 + 0.0041907 * solution;
 #### Must
 
 - improve documentation
-- buy hardware - 30 or 2 bar version, both?
+- buy hardware - 30 or 2 bar version, both to test
 - check TODO's in code / documentation
-- test
 
 
 #### Should
@@ -346,11 +345,12 @@ density = 0.998438 + 0.0041907 * solution;
   - so one does not need to set mathMode.
   - for MS5803
 - investigate the effects of float math on accuracy / precision.
-- add OSR factor to code
 
 
 #### Could
 
+- add **uint16_t getPromZero()** read out manufacturer bits, CRC + extra bits.
+  - useful for debugging?
 - add **void setAirPressure(float airPressure)** idea is to set it only once when P changes.
 - add **float getAirPressure()** return last set value.
 - refactor type & mathMode
@@ -364,6 +364,13 @@ density = 0.998438 + 0.0041907 * solution;
   - could be 0.2.0 if sync version works. 
   - ==> also MS5611 ?
 
+```cpp
+uint16_t getPromZero()
+{
+  uint16_t value = C[0];  //  first convert back to uint16_t.
+  return value;
+}
+```
 
 #### Won't (unless requested)
 

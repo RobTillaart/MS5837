@@ -26,9 +26,9 @@ class MS5837
 public:
   MS5837(TwoWire *wire = &Wire);
 
-  //  MS5837-30bar = 0
-  //  MS5837-02bar = 1
-  //  MS5803-02bar = 2
+  //  MS5837_30 bar = 0
+  //  MS5837_02 bar = 1
+  //  MS5803_02 bar = 2
   bool     begin(uint8_t mathMode);
   bool     isConnected();
   bool     reset(uint8_t mathMode);
@@ -41,7 +41,8 @@ public:
   //  READ
   //
   //  call will block 3-40 milliseconds, depends on # bits.
-  //  bits = 8-12   (8-13 for the MS5837_02)
+  //  bits = 8-12 for the MS5803_02
+  //  bits = 8-13 for the MS5837_02 and MS5837_30)
   bool     read(uint8_t bits = 8);
   uint32_t lastRead();
 

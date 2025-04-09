@@ -76,18 +76,21 @@ uint8_t MS5837::getAddress()
 //  READ
 //
 //  datasheet page 7
+//  bits determines OSR => nr of samples => accuracy etc
 bool MS5837::read(uint8_t bits)
 {
   if (isConnected() == false) return false;
 
-  int index = constrain(bits, 8, 13);
-  index -= 8;
+  int OSR = constrain(bits, 8, 13);
+  OSR -= 8;
+  //  datasheet page 2 OSR, ADC maximum conversion time.
   uint8_t waitMillis[6] = { 1, 2, 3, 5, 9, 18 };
-  uint8_t wait = waitMillis[index];
+  uint8_t wait = waitMillis[OSR];
 
    //  D1 conversion
   _wire->beginTransmission(_address);
-  _wire->write(MS5837_CMD_CONVERT_D1 + index * 2);
+  //  datasheet page 7 adjust command byte based on OSR
+  _wire->write(MS5837_CMD_CONVERT_D1 + OSR * 2);
   _error = _wire->endTransmission();
   if (_error != 0)
   {
@@ -108,7 +111,8 @@ bool MS5837::read(uint8_t bits)
 
    //  D2 conversion
   _wire->beginTransmission(_address);
-  _wire->write(MS5837_CMD_CONVERT_D2 + index * 2);
+  //  datasheet page 7 adjust command byte based on OSR
+  _wire->write(MS5837_CMD_CONVERT_D2 + OSR * 2);
   _error = _wire->endTransmission();
   if (_error != 0)
   {
@@ -252,7 +256,7 @@ void MS5837::initConstants(uint8_t mathMode)
   C[6] = 1.1920928955E-7; //  TEMPSENS = C[6] / 2^23  |  / 2^23
   C[7] = 1.220703125E-4;  //  compensate uses / 2^13  |  / 2^15
 
-  //  Appnote version for pressure.
+  //  App note version for pressure.
   //  adjustments for MS5837_02
   if (mathMode == 1)
   {
