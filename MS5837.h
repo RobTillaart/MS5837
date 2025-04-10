@@ -86,7 +86,7 @@ protected:
   uint32_t   readADC();
 
 
-  uint8_t   _address = 0x76;   //  fixed address
+  uint8_t   _address = 0x76;
   TwoWire * _wire = NULL;
 
   float     _pressure;
@@ -108,7 +108,23 @@ protected:
 //  DERIVED CLASSES
 //
 
-//  MS5837_30   MS5837_02  etc ?
+//////////////////////////////////////////////////////////////////////
+//
+//  MS5803
+//
+class MS5803 : public MS5837
+{
+public:
+  MS5803(TwoWire *wire = &Wire);
+  MS5803(uint32_t address, TwoWire *wire = &Wire);
+};
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//  MS5837_30
+//  MS5837_02
+//
 
 
 //  -- END OF FILE --

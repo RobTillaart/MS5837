@@ -100,7 +100,14 @@ THerefore the I2C speed is not a parameter to be tuned.
 
 ### Address
 
-The MS5837 has a fixed I2C address: 0x76.
+|  Device     |  Address       |  Notes  |
+|:-----------:|:--------------:|:--------|
+|  MS5837-02  |  0x76          |  single fixed
+|  MS5839-30  |  0x76          |  single fixed
+|  MS5803-01  |  0x76 or 0x77  |  to be set with CSB pin. 
+
+The library only supports 0x76 for now.
+
 
 ### I2C multiplexing
 
@@ -120,7 +127,7 @@ too if they are behind the multiplexer.
 - https://github.com/RobTillaart/TCA9548
 
 
-## Interface
+## Interface MS5837
 
 ```cpp
 #include MS5837.h
@@ -128,7 +135,7 @@ too if they are behind the multiplexer.
 
 ### Constructor
 
-- **MS5837(TwoWire \* wire = &Wire))** constructor, optional I2C bus.
+- **MS5837(TwoWire \* wire = &Wire)** constructor, optional I2C bus.
 - **bool begin(uint8_t mathMode)** initializes the library.
 - **bool isConnected()** returns true if device visible on I2C bus.
 - **bool reset(uint8_t mathMode)** resets the sensor and reads its configuration.
@@ -203,6 +210,21 @@ experimental / minimal
 - **int lastError()** returns the last error code.
 Resets to 0 when called.
 
+
+## Interface MS5803
+
+```cpp
+#include MS5837.h
+```
+
+### Constructor
+
+- **MS5803(TwoWire \* wire = &Wire)** set the address to 0x76
+0x76 and optional select the I2C bus used.
+- **MS5803(uint8_t address, TwoWire \* wire = &Wire)** set the address 
+0x76 or 0x77 and optional select the I2C bus used.
+
+----
 
 ## Density 
 

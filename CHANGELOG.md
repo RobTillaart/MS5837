@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - update readme.md
 - add **int lastError()** to prepare error handling
 - add **uint32_t lastRead()**
+- add derived class **MS5803** to be able to set address.
 - minor edits
 
 
