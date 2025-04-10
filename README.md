@@ -20,12 +20,14 @@ Library for the MS5837 temperature and pressure sensor and compatibles.
 
 The MS5837 is a waterproof device to measure temperature and pressure to a high level
 of accuracy.
-From the pressure one can calculate the depth or the altitude of the sensor to some extend.
-- The MS5837_30 can go to depth of about 300 meter (30 Bar).
+
+From the measured pressure one can calculate the depth or the altitude of the sensor to some extend.
+- The MS5837_30 can go to depth of about 300 meter as it can measure up to 30 Bar.
 - The MS5837_02 is meant for altitude measurements as it can as low as 300 mBar, -20°C
 - The MS5803_01 is meant for altitude measurements as it can as low as 10 mBar, -40°C
 
-The library only supports I2C based sensors, fixed address 0x76.
+The library only supports the I2C based sensors, fixed address 0x76 for the MS5837 
+and address 0x76 or 0x77 for the MS5803.
 
 The library does not use the partially 64 bit integer math as described in the datasheet.
 Instead it uses float math.
@@ -106,7 +108,8 @@ THerefore the I2C speed is not a parameter to be tuned.
 |  MS5839-30  |  0x76          |  single fixed
 |  MS5803-01  |  0x76 or 0x77  |  to be set with CSB pin. 
 
-The library only supports 0x76 for now.
+The MS5837 class has a fixed address of 0x76, the MS5803 class allows
+to select address 0x77.
 
 
 ### I2C multiplexing
@@ -432,9 +435,9 @@ From - https://www.mide.com/air-pressure-at-altitude-calculator
 #### Should
 
 - improve error handling
-- create derived classes?
+- improve class model
+  - derived classes MS5803
   - so one does not need to set mathMode.
-  - for MS5803
 - investigate the effects of float math on accuracy / precision.
 
 
