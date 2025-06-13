@@ -317,7 +317,7 @@ uint32_t MS5837::readADC()
 //
 //  MS5803
 //
-MS5803::MS5803(TwoWire *wire):MS5837(wire)
+MS5803::MS5803(TwoWire *wire) : MS5837(wire)
 {
 }
 

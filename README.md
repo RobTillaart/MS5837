@@ -29,11 +29,11 @@ From the measured pressure one can calculate the depth or the altitude of the se
 The library only supports the I2C based sensors, fixed address 0x76 for the MS5837 
 and address 0x76 or 0x77 for the MS5803.
 
-The library does not use the partially 64 bit integer math as described in the datasheet.
+This library does not use the partially 64 bit integer math as described in the datasheet.
 Instead it uses float math.
 This choice reduces footprint on e.g. AVR and increases the math performance.
 This will however have an effect on the accuracy of the results, 
-although these are expected to be relative small.
+although this effect is expected to be relative small.
 
 The library is not tested with hardware yet.
 
@@ -434,11 +434,12 @@ From - https://www.mide.com/air-pressure-at-altitude-calculator
 
 #### Should
 
-- improve error handling
 - improve class model
   - derived classes MS5803
-  - so one does not need to set mathMode.
+  - so one does not need to set mathMode ==> deviceType is better.
+- improve error handling
 - investigate the effects of float math on accuracy / precision.
+  - simulate raw values through both maths.
 
 
 #### Could
