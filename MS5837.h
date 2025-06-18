@@ -2,7 +2,7 @@
 //
 //    FILE: MS5837.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.1
+// VERSION: 0.1.2
 //    DATE: 2023-11-12
 // PURPOSE: Arduino library for MS5837 temperature and pressure sensor.
 //     URL: https://github.com/RobTillaart/MS5837
@@ -12,13 +12,21 @@
 #include "Wire.h"
 
 
-#define MS5837_LIB_VERSION        (F("0.1.1"))
+#define MS5837_LIB_VERSION        (F("0.1.2"))
 
 
 //  TYPES
-#define MS5803_TYPE_01             1
-#define MS5837_TYPE_02             2
-#define MS5837_TYPE_30            30
+#define MS5837_TYPE_UNKNOWN       255
+#define MS5803_TYPE_01              1
+#define MS5837_TYPE_02              2
+#define MS5837_TYPE_30             30
+
+
+//  ERROR CODES
+#define MS5837_OK                   0
+//  I2C twoWire can return 2, 3, 4
+#define MS5837_ERROR_I2C          -10
+#define MS5837_ERROR_REQUEST      -11
 
 
 class MS5837
@@ -80,6 +88,15 @@ public:
   int      getLastError();
 
 
+  //////////////////////////////////////////////////////////////////////
+  //
+  //  PROM zero - meta info
+  //
+  uint16_t getCRC();
+  uint16_t getProduct();
+  uint16_t getFactorySettings();
+
+
 protected:
   int        command(uint8_t cmd);
   void       initConstants(uint8_t mathMode);
@@ -93,12 +110,11 @@ protected:
   float     _temperature;
 
   float     C[8];
-  uint8_t   _type;
-  int       _result;
+  uint8_t   _type = MS5837_TYPE_UNKNOWN;
 
   float     _density = 0.99802;  //  water at 20 °C
   //  prepare error handling.
-  int       _error = 0;
+  int       _error = MS5837_OK;
   uint32_t  _lastRead;
 };
 

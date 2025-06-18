@@ -29,11 +29,11 @@ From the measured pressure one can calculate the depth or the altitude of the se
 The library only supports the I2C based sensors, fixed address 0x76 for the MS5837 
 and address 0x76 or 0x77 for the MS5803.
 
-The library does not use the partially 64 bit integer math as described in the datasheet.
+This library does not use the partially 64 bit integer math as described in the datasheet.
 Instead it uses float math.
 This choice reduces footprint on e.g. AVR and increases the math performance.
 This will however have an effect on the accuracy of the results, 
-although these are expected to be relative small.
+although this effect is expected to be relative small.
 
 The library is not tested with hardware yet.
 
@@ -208,10 +208,33 @@ Multiple calls will return the same value until read() is called again.
 
 ### Error handling
 
-experimental / minimal
+Experimental, 
 
 - **int lastError()** returns the last error code.
 Resets to 0 when called.
+
+|  Code  |  Description           |  Notes  |
+|:------:|:----------------------:|:--------|
+|     0  |  MS5837_OK             |  no error
+|   1-4  |  twoWire specific      |  check low level library
+|   -10  |  MS5837_ERROR_I2C      |  generic I2C (not used yet)
+|   -11  |  MS5837_ERROR_REQUEST  |  requestFrom error
+
+
+### Meta info
+
+Experimental, can be used as device identification. 
+Note: works for MS5837 only.
+
+- **uint16_t getCRC()** can be used to verify the PROM codes
+- **uint16_t getProduct()** see table below
+- **uint16_t getFactorySettings()** meaning unknown
+
+|  Device         |  Product code  |
+|:---------------:|:--------------:|
+|  MS5837_02BA01  |          0x00  |
+|  MS5837_02BA21  |          0x15  |
+|  MS5837_30BA26  |          0x1A  |
 
 
 ## Interface MS5803
@@ -429,22 +452,19 @@ From - https://www.mide.com/air-pressure-at-altitude-calculator
 
 - improve documentation
 - buy hardware - 30 or 2 bar version, both to test
-- check TODO's in code / documentation
 
 
 #### Should
 
-- improve error handling
 - improve class model
   - derived classes MS5803
-  - so one does not need to set mathMode.
+  - so one does not need to set mathMode ==> deviceType is better.
 - investigate the effects of float math on accuracy / precision.
+  - simulate raw values through both maths.
 
 
 #### Could
 
-- add **uint16_t getPromZero()** read out manufacturer bits, CRC + extra bits.
-  - useful for debugging?
 - add **void setAirPressure(float airPressure)** idea is to set it only once when P changes.
 - add **float getAirPressure()** return last set value.
 - refactor type & mathMode
