@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.1.2] - 2025-06-13
 - improve demo sketch - add getLastError()
+- improve error handling
+- add getCRC(), getProduct(), getFactorySettings().
+- update readme.md
 - update keywords
 - minor edits
 
@@ -18,7 +21,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - add **uint32_t lastRead()**
 - add derived class **MS5803** to be able to set address.
 - minor edits
-
 
 ## [0.1.0] - 2023-12-24
 - initial release

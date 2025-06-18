@@ -24,6 +24,9 @@ getDepth	KEYWORD2
 
 getLastError	KEYWORD2
 
+getCRC	KEYWORD2
+getProduct	KEYWORD2
+getManufacturer	KEYWORD2
 
 
 # Constants (LITERAL1)

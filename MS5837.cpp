@@ -34,12 +34,17 @@ bool MS5837::begin(uint8_t mathMode)
 bool MS5837::isConnected()
 {
   _wire->beginTransmission(_address);
-  return ( _wire->endTransmission() == 0);
+  _error = _wire->endTransmission();
+  return ( _error == MS5837_OK);
 }
 
 bool MS5837::reset(uint8_t mathMode)
 {
   command(MS5837_CMD_RESET);
+  if (_error != MS5837_OK)
+  {
+    return false;
+  }
   uint32_t start = millis();
   //  while loop prevents blocking RTOS
   while (micros() - start < 10)
@@ -49,7 +54,10 @@ bool MS5837::reset(uint8_t mathMode)
   }
 
   initConstants(mathMode);
-
+  if (_error != MS5837_OK)
+  {
+    return false;
+  }
   //  SKIP CRC check (for now)
 
   //  derive the type from mathMode instead of the other way around.
@@ -79,7 +87,10 @@ uint8_t MS5837::getAddress()
 //  bits determines OSR => nr of samples => accuracy etc
 bool MS5837::read(uint8_t bits)
 {
-  if (isConnected() == false) return false;
+  if (isConnected() == false)
+  {
+    return false;
+  }
 
   int OSR = constrain(bits, 8, 13);
   OSR -= 8;
@@ -92,9 +103,9 @@ bool MS5837::read(uint8_t bits)
   //  datasheet page 7 adjust command byte based on OSR
   _wire->write(MS5837_CMD_CONVERT_D1 + OSR * 2);
   _error = _wire->endTransmission();
-  if (_error != 0)
+  if (_error != MS5837_OK)
   {
-    //  _error = MS5837_I2C_ERROR ?
+    //  _error = twoWire specific.
     return false;
   }
 
@@ -108,15 +119,20 @@ bool MS5837::read(uint8_t bits)
   }
   //  NOTE: names D1 and D2 are reserved in MBED (NANO BLE)
   uint32_t _D1 = readADC();
+  if (_error != MS5837_OK)
+  {
+    //  _error = twoWire specific.
+    return false;
+  }
 
    //  D2 conversion
   _wire->beginTransmission(_address);
   //  datasheet page 7 adjust command byte based on OSR
   _wire->write(MS5837_CMD_CONVERT_D2 + OSR * 2);
   _error = _wire->endTransmission();
-  if (_error != 0)
+  if (_error != MS5837_OK)
   {
-    //  _error = MS5837_I2C_ERROR ?
+    //  _error = twoWire specific.
     return false;
   }
 
@@ -130,7 +146,11 @@ bool MS5837::read(uint8_t bits)
 
   //  NOTE: names D1 and D2 are reserved in MBED (NANO BLE)
   uint32_t _D2 = readADC();
-
+  if (_error != MS5837_OK)
+  {
+    //  _error = twoWire specific.
+    return false;
+  }
   float dT = _D2 - C[5];
   _temperature = 2000 + dT * C[6];
 
@@ -156,6 +176,7 @@ bool MS5837::read(uint8_t bits)
   _temperature *= 0.01;
 
   _lastRead = millis();
+  _error = MS5837_OK;
   return true;
 }
 
@@ -227,6 +248,29 @@ int MS5837::getLastError()
 
 //////////////////////////////////////////////////////////////////////
 //
+//  PROM zero - meta info
+//
+uint16_t MS5837::getCRC()
+{
+  uint16_t value = C[0];
+  return value >> 12;
+}
+
+uint16_t MS5837::getProduct()
+{
+  uint16_t value = C[0];
+  return (value >> 5) & 0x007F;
+}
+
+uint16_t MS5837::getFactorySettings()
+{
+  uint16_t value = C[0];
+  return value & 0x001F;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
 //  PROTECTED
 //
 int MS5837::command(uint8_t cmd)
@@ -234,8 +278,8 @@ int MS5837::command(uint8_t cmd)
   yield();
   _wire->beginTransmission(_address);
   _wire->write(cmd);
-  _result = _wire->endTransmission();
-  return _result;
+  _error = _wire->endTransmission();
+  return _error;
 }
 
 
@@ -278,33 +322,42 @@ void MS5837::initConstants(uint8_t mathMode)
   {
     _wire->beginTransmission(_address);
     _wire->write(MS5837_CMD_READ_PROM + i + i);
-    _wire->endTransmission();
+    _error = _wire->endTransmission();
+    if (_error != MS5837_OK)
+    {
+      return;
+    }
     uint8_t length = 2;
-    _wire->requestFrom(_address, length);
+    if (_wire->requestFrom(_address, length) != length)
+    {
+      _error = MS5837_ERROR_REQUEST;
+      return;
+    }
     uint16_t tmp = _wire->read() << 8;
     tmp |= _wire->read();
     C[i] *= tmp;
   }
+  _error = MS5837_OK;
 }
 
 
 uint32_t MS5837::readADC()
 {
   command(MS5837_CMD_READ_ADC);
-  if (_result == 0)
+  if (_error != MS5837_OK)
   {
-    uint8_t length = 3;
-    int bytes = _wire->requestFrom(_address, length);
-    if (bytes >= length)
-    {
-      uint32_t value = _wire->read() * 65536UL;
-      value += _wire->read() * 256UL;
-      value += _wire->read();
-      return value;
-    }
     return 0UL;
   }
-  return 0UL;
+  uint8_t length = 3;
+  if (_wire->requestFrom(_address, length) != length)
+  {
+    _error = MS5837_ERROR_REQUEST;
+    return 0UL;
+  }
+  uint32_t value = _wire->read() * 65536UL;
+  value += _wire->read() * 256UL;
+  value += _wire->read();
+  return value;
 }
 
 
