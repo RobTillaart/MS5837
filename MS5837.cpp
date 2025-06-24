@@ -1,7 +1,7 @@
 //
 //    FILE: MS5837.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.1
+// VERSION: 0.2.0
 //    DATE: 2023-11-12
 // PURPOSE: Arduino library for MS5837 temperature and pressure sensor.
 //     URL: https://github.com/RobTillaart/MS5837
@@ -13,8 +13,8 @@
 #define MS5837_CMD_READ_ADC       0x00
 #define MS5837_CMD_READ_PROM      0xA0
 #define MS5837_CMD_RESET          0x1E
-#define MS5837_CMD_CONVERT_D1     0x4A  //  differs from MS5611
-#define MS5837_CMD_CONVERT_D2     0x5A  //  differs from MS5611
+#define MS5837_CMD_CONVERT_D1     0x40
+#define MS5837_CMD_CONVERT_D2     0x50
 
 
 //  CONSTRUCTOR
@@ -85,11 +85,11 @@ uint8_t MS5837::getAddress()
 //
 //  datasheet page 7
 //  bits determines OSR => nr of samples => accuracy etc
-bool MS5837::read(uint8_t bits)
+int MS5837::read(uint8_t bits)
 {
   if (isConnected() == false)
   {
-    return false;
+    return -1;
   }
 
   int OSR = constrain(bits, 8, 13);
@@ -106,13 +106,13 @@ bool MS5837::read(uint8_t bits)
   if (_error != MS5837_OK)
   {
     //  _error = twoWire specific.
-    return false;
+    return -2;
   }
 
   uint32_t start = millis();
 
   //  while loop prevents blocking RTOS
-  while (micros() - start < wait)
+  while (millis() - start < wait)
   {
     yield();
     delay(1);
@@ -122,7 +122,7 @@ bool MS5837::read(uint8_t bits)
   if (_error != MS5837_OK)
   {
     //  _error = twoWire specific.
-    return false;
+    return -3;
   }
 
    //  D2 conversion
@@ -133,12 +133,12 @@ bool MS5837::read(uint8_t bits)
   if (_error != MS5837_OK)
   {
     //  _error = twoWire specific.
-    return false;
+    return -4;
   }
 
   start = millis();
   //  while loop prevents blocking RTOS
-  while (micros() - start < wait)
+  while (millis() - start < wait)
   {
     yield();
     delay(1);
@@ -149,7 +149,7 @@ bool MS5837::read(uint8_t bits)
   if (_error != MS5837_OK)
   {
     //  _error = twoWire specific.
-    return false;
+    return -5;
   }
   float dT = _D2 - C[5];
   _temperature = 2000 + dT * C[6];
@@ -177,7 +177,7 @@ bool MS5837::read(uint8_t bits)
 
   _lastRead = millis();
   _error = MS5837_OK;
-  return true;
+  return 0;
 }
 
 uint32_t MS5837::lastRead()

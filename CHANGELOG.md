@@ -6,13 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [0.1.2] - 2025-06-13
+## [0.2.0] - 2025-06-13
+- fix #4, read() error
+- change API to **int read()** for better debugability
 - improve demo sketch - add getLastError()
 - improve error handling
 - add getCRC(), getProduct(), getFactorySettings().
 - update readme.md
 - update keywords
 - minor edits
+
+----
 
 ## [0.1.1] - 2025-04-07
 - update GitHub actions

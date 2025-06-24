@@ -1,16 +1,16 @@
-//    FILE: MS5837_demo.ino
+//    FILE: MS5837_performance.ino
 //  AUTHOR: Rob Tillaart
 // PURPOSE: demo MS5837 library
 //     URL: https://github.com/RobTillaart/MS5837
 
 /*  AVR I2C codes
-|     0  |  success
-|     1  |  length to long for buffer
-|     2  |  address send, NACK received
-|     3  |  data send, NACK received
-|     4  |  other twi error
-|     5  |  timeout
- */
+  |     0  |  success
+  |     1  |  length to long for buffer
+  |     2  |  address send, NACK received
+  |     3  |  data send, NACK received
+  |     4  |  other twi error
+  |     5  |  timeout
+*/
 
 #include "Arduino.h"
 #include "Wire.h"
@@ -19,6 +19,7 @@
 
 MS5837 MS(&Wire);
 
+uint32_t start, stop;
 
 void setup()
 {
@@ -30,7 +31,7 @@ void setup()
   Serial.println();
 
   Wire.begin();
- 
+
   if (MS.begin(1) == true)
   {
     Serial.println("MS5837 found.");
@@ -46,7 +47,11 @@ void setup()
 
 void loop()
 {
-  if (MS.read(8) != 0)
+  delay(100);
+  start = micros();
+  int ret = MS.read(13);
+  stop = micros();
+  if (ret != 0)
   {
     Serial.print("Read Error!!\t");
   }
@@ -60,8 +65,10 @@ void loop()
   Serial.print(MS.getDepth(), 2);
   Serial.print("\tE: ");
   Serial.print(MS.getLastError());
+  Serial.print("\tM: ");
+  Serial.print(stop - start);
   Serial.println();
-  delay(3000);
+  delay(1000);
 }
 
 

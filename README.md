@@ -46,6 +46,7 @@ Feedback as always is welcome.
 - https://github.com/RobTillaart/temperature Conversions
 - https://github.com/RobTillaart/MS5611 temperature and pressure sensor
 - https://www.usgs.gov/special-topics/water-science-school/science/water-density
+- https://www.mide.com/air-pressure-at-altitude-calculator
 
 See also .h file
 
@@ -150,16 +151,16 @@ Returns 30 or 2 or zero if unknown.
 
 ### Temperature and Pressure
 
-- **bool read(uint8_t bits = 8)** the actual reading of the sensor. 
+- **int read(uint8_t bits = 8)** the actual reading of the sensor. 
 The bits determines the oversampling rate (OSR), see table below. 
-Returns true upon success, false otherwise.
+Returns 0 upon success, a negative number on failure (debug info).
 The call will block for 3 to 40 milliseconds, depending upon number of bits.
 
-|  type       |  bits read()  | 
-|:-----------:|:-------------:|
-|  MS5837_30  |  8..13        |
-|  MS5837_02  |  8..13        |
-|  MS5803_01  |  8..12        |
+|  type       |  bits read()  |  millis  |  notes  |
+|:-----------:|:-------------:|:--------:|:--------|
+|  MS5837_30  |  8..13        |  5-40    |
+|  MS5837_02  |  8..13        |  5-40    |
+|  MS5803_01  |  8..12        |          |  not tested
 
 
 - **uint32_t lastRead()** returns the timestamp of the last call to read() in 
@@ -216,7 +217,12 @@ Resets to 0 when called.
 |  Code  |  Description           |  Notes  |
 |:------:|:----------------------:|:--------|
 |     0  |  MS5837_OK             |  no error
-|   1-4  |  twoWire specific      |  check low level library
+|   1-5  |  twoWire specific      |  check low level library
+|     1  |  length to long for buffer   |  avr TwoWire
+|     2  |  address send, NACK received |  avr TwoWire
+|     3  |  data send, NACK received    |  avr TwoWire
+|     4  |  other twi error             |  avr TwoWire
+|     5  |  timeout                     |  avr TwoWire
 |   -10  |  MS5837_ERROR_I2C      |  generic I2C (not used yet)
 |   -11  |  MS5837_ERROR_REQUEST  |  requestFrom error
 

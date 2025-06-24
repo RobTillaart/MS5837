@@ -1,16 +1,16 @@
-//    FILE: MS5837_demo.ino
+//    FILE: MS5837_demo_meta_data.ino
 //  AUTHOR: Rob Tillaart
 // PURPOSE: demo MS5837 library
 //     URL: https://github.com/RobTillaart/MS5837
 
 /*  AVR I2C codes
-|     0  |  success
-|     1  |  length to long for buffer
-|     2  |  address send, NACK received
-|     3  |  data send, NACK received
-|     4  |  other twi error
-|     5  |  timeout
- */
+  |     0  |  success
+  |     1  |  length to long for buffer
+  |     2  |  address send, NACK received
+  |     3  |  data send, NACK received
+  |     4  |  other twi error
+  |     5  |  timeout
+*/
 
 #include "Arduino.h"
 #include "Wire.h"
@@ -30,7 +30,7 @@ void setup()
   Serial.println();
 
   Wire.begin();
- 
+
   if (MS.begin(1) == true)
   {
     Serial.println("MS5837 found.");
@@ -40,28 +40,18 @@ void setup()
     Serial.println("MS5837 not found. halt.");
     // while (1);
   }
+  Serial.println(MS.getCRC());
+  Serial.println(MS.getLastError());
+  Serial.println(MS.getProduct());
+  Serial.println(MS.getLastError());
+  Serial.println(MS.getFactorySettings());
+  Serial.println(MS.getLastError());
   Serial.println();
 }
 
 
 void loop()
 {
-  if (MS.read(8) != 0)
-  {
-    Serial.print("Read Error!!\t");
-  }
-  Serial.print("T: ");
-  Serial.print(MS.getTemperature(), 2);
-  Serial.print("\tP: ");
-  Serial.print(MS.getPressure(), 2);
-  Serial.print("\tA: ");
-  Serial.print(MS.getAltitude(), 2);
-  Serial.print("\tD: ");
-  Serial.print(MS.getDepth(), 2);
-  Serial.print("\tE: ");
-  Serial.print(MS.getLastError());
-  Serial.println();
-  delay(3000);
 }
 
 

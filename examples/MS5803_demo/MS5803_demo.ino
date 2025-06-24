@@ -37,7 +37,7 @@ void setup()
 
 void loop()
 {
-  if (MS.read() == false)
+  if (MS.read() != 0)
   {
     Serial.print("Read Error!!");
   }

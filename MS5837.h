@@ -2,7 +2,7 @@
 //
 //    FILE: MS5837.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.2
+// VERSION: 0.2.0
 //    DATE: 2023-11-12
 // PURPOSE: Arduino library for MS5837 temperature and pressure sensor.
 //     URL: https://github.com/RobTillaart/MS5837
@@ -12,7 +12,7 @@
 #include "Wire.h"
 
 
-#define MS5837_LIB_VERSION        (F("0.1.2"))
+#define MS5837_LIB_VERSION        (F("0.2.0"))
 
 
 //  TYPES
@@ -51,7 +51,8 @@ public:
   //  call will block 3-40 milliseconds, depends on # bits.
   //  bits = 8-12 for the MS5803_02
   //  bits = 8-13 for the MS5837_02 and MS5837_30)
-  bool     read(uint8_t bits = 8);
+  //  returns 0 on success
+  int      read(uint8_t bits = 8);
   uint32_t lastRead();
 
   //  see https://github.com/RobTillaart/pressure for conversions.
