@@ -24,7 +24,7 @@
 
 //  ERROR CODES
 #define MS5837_OK                   0
-//  I2C twoWire can return 2, 3, 4
+//  I2C twoWire can return 1..5 (AVR)
 #define MS5837_ERROR_I2C          -10
 #define MS5837_ERROR_REQUEST      -11
 
@@ -50,7 +50,7 @@ public:
   //
   //  call will block 3-40 milliseconds, depends on # bits.
   //  bits = 8-12 for the MS5803_02
-  //  bits = 8-13 for the MS5837_02 and MS5837_30)
+  //  bits = 8-13 for the MS5837_02 and MS5837_30
   //  returns 0 on success
   int      read(uint8_t bits = 8);
   uint32_t lastRead();
@@ -62,6 +62,7 @@ public:
   //  returns Celsius
   float    getTemperature();
   //       compensate for actual air pressure if needed
+  //       returns meters.
   float    getAltitude(float airPressure = 1013.25);
 
 
@@ -84,7 +85,7 @@ public:
 
   //////////////////////////////////////////////////////////////////////
   //
-  //  ERROR (experimental)
+  //  ERROR
   //
   int      getLastError();
 

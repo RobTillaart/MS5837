@@ -151,28 +151,74 @@ int MS5837::read(uint8_t bits)
     //  _error = twoWire specific.
     return -5;
   }
+
+  //  determine temperature
   float dT = _D2 - C[5];
   _temperature = 2000 + dT * C[6];
 
+  //  determine pressure
   float offset = C[2] + dT * C[4];
   float sens   = C[1] + dT * C[3];
   _pressure = _D1 * sens + offset;
 
 
   //  Second order compensation
-  if (_temperature < 20)
+  //  Comment to save footprint (trade accuracy)
+  if ((_temperature * 0.01) < 20)
   {
-    float ti = dT * dT * (11 * 2.91038304567E-11);  //  1 / 2^35
-    float t = (_temperature - 2000) * (_temperature - 2000);
-    float offset2 = t * (31 * 0.125);  //  1 / 2^3
-    float sens2 = t * (63 * 0.03125);  //  1 / 2^5
-
+    float ti = 0, offset2 = 0, sens2 = 0;
+    float t2 = (_temperature - 2000) * (_temperature - 2000);
+    //  Math mode 0  Page 12
+    if (_type == MS5837_TYPE_30)
+    {
+      ti = dT * dT * (3 * 1.164153218269E-10);  //  1 / 2^33
+      offset2 = t2 * (3 * 0.5);  //  1 / 2^1
+      sens2 = t2 * (5 * 0.125);  //  1 / 2^3
+      if ((_temperature * 0.01) < -15)
+      {
+        t2 = (_temperature + 1500) * (_temperature + 1500);
+        offset2 += 7 * t2;
+        sens2   += 4 * t2;
+      }
+    }
+    //  math mode 1
+    if (_type == MS5837_TYPE_02)
+    {
+      ti = dT * dT * (11 * 2.91038304567E-11);  //  1 / 2^35
+      offset2 = t2 * (31 * 0.125);  //  1 / 2^3
+      sens2 = t2 * (63 * 0.03125);  //  1 / 2^5
+    }
+    //  math mode 2
+    if (_type == MS5803_TYPE_01)
+    {
+      ti = dT * dT * (3 * 4.656612873077E-10);  //  1 / 2^31
+      offset2 = t2 * (3 * 1.0);  //  1 / 2^0
+      sens2 = t2 * (7 * 0.125);  //  1 / 2^3
+      if ((_temperature * 0.01) < -15)
+      {
+        t2 = (_temperature + 1500) * (_temperature + 1500);
+        sens2   += 2 * t2;
+      }
+    }
+    else
+    {
+      // temperature > 20C MS5803 only
+      if ((_type == MS5803_TYPE_01) && ( (_temperature * 0.01) > 45))
+      {
+        t2 = (_temperature - 4500) * (_temperature - 4500);
+        sens2 -= t2 * 0.125;  //  1/2^3
+      }
+    }
     offset       -= offset2;
     sens         -= sens2;
     _temperature -= ti;
   }
+
+
   //                         1 / 2^21                    C[7] / 100
   _pressure = (_D1 * sens * 4.76837158203E-7 - offset) * C[7] * 0.01;
+  if (_type == MS5837_TYPE_30) _pressure *= 10;
+
   _temperature *= 0.01;
 
   _lastRead = millis();
@@ -204,7 +250,7 @@ float MS5837::getTemperature()
 float MS5837::getAltitude(float airPressure)
 {
   float ratio = _pressure / airPressure;
-  return 44330 * (1 - pow(ratio, 0.190294957));
+  return 44307.694 * (1 - pow(ratio, 0.190284));
 }
 
 
@@ -298,7 +344,7 @@ void MS5837::initConstants(uint8_t mathMode)
   C[4] = 7.8125E-3;       //  TCO      = C[4] / 2^7   |  / 2^6   |  / 2^7   |
   C[5] = 256;             //  Tref     = C[5] * 2^8   |  * 2^8   |  * 2^8   |
   C[6] = 1.1920928955E-7; //  TEMPSENS = C[6] / 2^23  |  / 2^23  |  / 2^23  |
-  C[7] = 1.220703125E-4;  //  compensate uses / 2^13  |  / 2^15  |  / 2^15  |
+  C[7] = 1.220703125E-4;  //  compensate uses / 2^13  |  / 2^15  |  / 2^15  |  Pressure math (P)
 
   //  App note version for pressure.
   //  adjustments for MS5837_02

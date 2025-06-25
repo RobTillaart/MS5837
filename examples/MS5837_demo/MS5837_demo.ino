@@ -30,8 +30,10 @@ void setup()
   Serial.println();
 
   Wire.begin();
- 
-  if (MS.begin(1) == true)
+
+  //  MS5837_30 = 0
+  //  MS5837_02 = 1
+  if (MS.begin(0) == true)
   {
     Serial.println("MS5837 found.");
   }
@@ -50,7 +52,7 @@ void loop()
   {
     Serial.print("Read Error!!\t");
   }
-  Serial.print("T: ");
+  Serial.print("\tT: ");
   Serial.print(MS.getTemperature(), 2);
   Serial.print("\tP: ");
   Serial.print(MS.getPressure(), 2);
@@ -61,7 +63,7 @@ void loop()
   Serial.print("\tE: ");
   Serial.print(MS.getLastError());
   Serial.println();
-  delay(3000);
+  delay(1000);
 }
 
 

@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [0.2.0] - 2025-06-13
-- fix #4, read() error
+- fix #4, read() error after test with hardware
 - change API to **int read()** for better debugability
 - improve demo sketch - add getLastError()
+- redo getAltitude() formula 
+- add sketch MS5837_performance.ino
+- redo 2nd order compensation
 - improve error handling
-- add getCRC(), getProduct(), getFactorySettings().
+- add getCRC(), getProduct(), getFactorySettings()
+- add sketch MS5837_demo_meta_data.ino
 - update readme.md
 - update keywords
 - minor edits
