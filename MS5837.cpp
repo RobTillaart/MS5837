@@ -314,6 +314,7 @@ uint16_t MS5837::getFactorySettings()
   return value & 0x001F;
 }
 
+
 uint16_t MS5837::getPromZero()
 {
   uint16_t value = C[0];
