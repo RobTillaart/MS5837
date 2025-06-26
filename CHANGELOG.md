@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - add sketch MS5837_performance.ino
 - redo 2nd order compensation
 - improve error handling
-- add getCRC(), getProduct(), getFactorySettings()
+- add getCRC(), getProduct(), getFactorySettings(), getPromZero()
 - add sketch MS5837_demo_meta_data.ino
 - update readme.md
 - update keywords

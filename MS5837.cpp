@@ -315,6 +315,13 @@ uint16_t MS5837::getFactorySettings()
 }
 
 
+uint16_t MS5837::getPromZero()
+{
+  uint16_t value = C[0];
+  return value;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 //
 //  PROTECTED
