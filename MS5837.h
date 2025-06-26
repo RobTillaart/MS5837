@@ -97,7 +97,7 @@ public:
   uint16_t getCRC();
   uint16_t getProduct();
   uint16_t getFactorySettings();
-
+  uint16_t getPromZero();
 
 protected:
   int        command(uint8_t cmd);

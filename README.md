@@ -52,7 +52,7 @@ Feedback as always is welcome.
 ### Related
 
 - https://github.com/RobTillaart/pressure Conversions
-- https://github.com/RobTillaart/temperature Conversions
+- https://github.com/RobTillaart/Temperature Conversions + weather math
 - https://github.com/RobTillaart/MS5611 temperature and pressure sensor
 - https://www.usgs.gov/special-topics/water-science-school/science/water-density
 - https://www.mide.com/air-pressure-at-altitude-calculator
@@ -89,14 +89,15 @@ The library implements **reset(uint8_t mathMode = 0)** to select the mathMode.
 
 The MS5837 library uses similar code as the tested MS5611 library.
 
-The library is tested with the Arduino UNO R3:
+The library is tested with the Arduino UNO R3 for version 0.2.0:
 
 |  BOARD   |  Sensor     | mathMode |  Notes  |
 |:--------:|:------------|:--------:|:--------|
-|  UNO R3  |  MS5837-30  |    0     |  under test
+|  UNO R3  |  MS5837-30  |    0     |  works
 |  UNO R3  |  MS5837-02  |    1     |  works
 |  UNO R3  |  MS5803-01  |    2     |  not tested
 
+The MS5803 will be tested when I the hardware.
 
 Please let me know of other working platforms / processors (and failing ones!).
 
@@ -170,8 +171,8 @@ The call will block for 3 to 40 milliseconds, depending upon number of bits.
 
 |  type       |  bits read()  |  millis  |  notes  |
 |:-----------:|:-------------:|:--------:|:--------|
-|  MS5837_30  |  8..13        |  5-40    |
-|  MS5837_02  |  8..13        |  5-40    |
+|  MS5837_30  |  8..13        |   5-40   |
+|  MS5837_02  |  8..13        |   5-40   |
 |  MS5803_01  |  8..12        |          |  not tested
 
 
@@ -190,7 +191,7 @@ One can compensate for the actual air pressure at sea level.
 
 Experimental note.
 
-**getALtitude()** might even work in caves below sea level, as the sensors can
+**getAltitude()** might even work in caves below sea level, as the sensors can
 measure up to 1200/1300 hPa. See air pressure table below. 
 This assumption is not confirmed yet.
 
@@ -241,19 +242,24 @@ Resets to 0 when called.
 
 ### Meta info
 
-Experimental, can be used as device identification. 
-Note: works for **MS5837_02** only.
+Experimental, 
 
+The PROM index zero of the MS58xx hold some device specific information.
+As these 2 bytes are relative random it can be used as device identification. 
+For the **MS5837_02** the meaning of two fields of PROM(0) is known.
+For the **MS5837_30** only one field is known.
 
 |  function            |  MS5837_02  |  MS5837_30  |  MS5803_xx  |
 |:--------------------:|:-----------:|:-----------:|:-----------:|
 |  getCRC              |      V      |      V      |      x      |
 |  getProduct          |      V      |      x      |      x      |
 |  getFactorySettings  |      V      |      x      |      x      |
+|  getPromZero         |      V      |      V      |      V      |
 
 - **uint16_t getCRC()** can be used to verify the PROM codes, check not implemented.
-- **uint16_t getProduct()** see table below
-- **uint16_t getFactorySettings()** meaning unknown
+- **uint16_t getProduct()** see table below.
+- **uint16_t getFactorySettings()** meaning unknown.
+- **uint16_t getPromZero()** can be used as device identification. 
 
 |  Device         |  Product code  |
 |:---------------:|:--------------:|
@@ -261,6 +267,7 @@ Note: works for **MS5837_02** only.
 |  MS5837_02BA21  |          0x15  |
 |  MS5837_30BA26  |          0x1A  |
 
+----
 
 ## Interface MS5803
 
@@ -280,7 +287,7 @@ Note: works for **MS5837_02** only.
 ## Density 
 
 Some indicative figures about density of water and other liquids.
-Different sources give slight variations, which are less than 0.1%.
+Different sources give slight variations, which differ less than 0.1%.
 
 
 ### Temperature
@@ -489,7 +496,6 @@ From - https://www.mide.com/air-pressure-at-altitude-calculator
 - test & verify 2nd order compensations. (Need special equipment)
 - investigate the effects of float math on accuracy / precision.
   - simulate raw values through both maths.
-
 
 #### Could
 
