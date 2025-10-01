@@ -45,7 +45,10 @@ void setup()
     // while (1);
   }
   Serial.println();
-  Serial.println("Temp\tPres\tAlt");
+
+  //  adjust labels to need.
+  //  Serial.println("Temp\tPres\tAlt");
+  Serial.println("Temp\tAlt");
 }
 
 

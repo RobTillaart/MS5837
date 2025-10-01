@@ -49,7 +49,7 @@ void setup()
     // while (1);
   }
   Serial.println();
-  Serial.println("Temp\tPres\tAlt");
+  Serial.println("Low\tMedian\tAvg\tHigh");
 
   while(MS.read(8) != 0);
 }

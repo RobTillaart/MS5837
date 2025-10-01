@@ -35,7 +35,7 @@ void setup()
 
   //  MS5837_30 = 0
   //  MS5837_02 = 1
-  if (MS.begin(1) == true)
+  if (MS.begin(0) == true)
   {
     Serial.println("MS5837 found.");
   }
