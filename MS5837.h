@@ -2,7 +2,7 @@
 //
 //    FILE: MS5837.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.3.1
+// VERSION: 0.3.2
 //    DATE: 2023-11-12
 // PURPOSE: Arduino library for MS5837 temperature and pressure sensor.
 //     URL: https://github.com/RobTillaart/MS5837
@@ -11,7 +11,7 @@
 #include "Arduino.h"
 #include "Wire.h"
 
-#define MS5837_LIB_VERSION        (F("0.3.1"))
+#define MS5837_LIB_VERSION        (F("0.3.2"))
 
 
 //  TYPES
